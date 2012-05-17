@@ -16,7 +16,7 @@ version to fit in w/ my existing paper-creating toolchain.
 
 To use as a stand-alone script
 -----------------------------
- >>> python flatten.py inputfile.tex outputfile.tex 
+ `python flatten.py inputfile.tex outputfile.tex` 
 
 Limitations: 
 ------------
