@@ -30,7 +30,9 @@ def combine_path(base_path, relative_ref):
     Combines the base path of the tex document being worked on 
 with the the relate reference found in that document.  
     """
-    return os.path.join(base_path, relative_ref)
+    os.chdir(base_path)
+    #return os.path.join(base_path, relative_ref)
+    return os.path.abspath(relative_ref)
 
 def expand_file(base_file):
     """

@@ -1,5 +1,5 @@
 # Test for flatten.py 
-
+import tempfile 
 import unittest2
 import flatex
 
@@ -11,7 +11,9 @@ Here is some stuff
 \input{foo.tex}
 And here is some more stuff.
         """
-        f = open("/tmp/flatex_test.tex", "w")
+        f = tempfile.NamedTemporaryFile(delete=False)
+        self.temp_file_name = f.name
+        #f = open("/tmp/flatex_test.tex", "w")
         f.write(file_text)
         f.close() 
         g = open("/tmp/foo.tex", "w")
@@ -48,8 +50,16 @@ And here is some more stuff.
         self.assertEqual(flatex.combine_path(base_path, 
                                               relative_ref), result)
 
+    def test_combine_path_dot_notation(self): 
+        base_path = "/tmp"
+        relative_ref = "./includes/test.tex"
+        result = "/tmp/includes/test.tex"
+        self.assertEqual(flatex.combine_path(base_path, 
+                                              relative_ref), result)
+
+
     def test_expand_file_open_file(self): 
-         combined_file = flatex.expand_file("/tmp/flatten_test.tex")
+         combined_file = flatex.expand_file(self.temp_file_name)
          expected_results = """
 Here is some stuff
 BONZAI!
