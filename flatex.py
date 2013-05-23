@@ -32,7 +32,9 @@ with the the relate reference found in that document.
     """
     os.chdir(base_path)
     #return os.path.join(base_path, relative_ref)
-    return os.path.abspath(relative_ref)
+    filePath = os.path.abspath(relative_ref)
+    filePath = filePath + ".tex"
+    return filePath
 
 def expand_file(base_file):
     """
