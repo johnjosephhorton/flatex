@@ -14,7 +14,8 @@ def is_input(line):
 uncommented out \input{} statement. Allows only spaces between 
 start of line and '\input{}'. 
     """
-    tex_input_re = r"""^\s*\\input{[^}]*}"""
+    #tex_input_re = r"""^\s*\\input{[^}]*}""" # input only 
+    tex_input_re = r"""(\\input{[^}]*})|(\\include{[^}]*})""" # input or include
     return re.search(tex_input_re, line) 
 
 def get_input(line):
