@@ -51,6 +51,7 @@ referenced file.
             current_path = os.path.split(base_file)[0] 
             new_base_file = combine_path(current_path, get_input(line))
             output_lines += expand_file(new_base_file)
+            output_lines.append('\n') # add a new line after each file input
         else:
             output_lines.append(line)
     f.close() 
