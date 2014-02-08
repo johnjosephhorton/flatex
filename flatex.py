@@ -3,6 +3,7 @@
 #  This "flattens" a LaTeX document by replacing all 
 #  \input{X} lines w/ the text actually contained in X. See 
 #  associated README.md for details. 
+#  Use as a python module in a python script by saying import flatex   then flatex.main(in file, out file)
 
 import os 
 import re 
