@@ -3,6 +3,7 @@
 #  This "flattens" a LaTeX document by replacing all 
 #  \input{X} lines w/ the text actually contained in X. See 
 #  associated README.md for details. 
+#  Use as a python module in a python script by saying import flatex   then flatex.main(in file, out file)
 
 import os 
 import re 
@@ -14,7 +15,8 @@ def is_input(line):
 uncommented out \input{} statement. Allows only spaces between 
 start of line and '\input{}'. 
     """
-    tex_input_re = r"""^\s*\\input{[^}]*}"""
+    #tex_input_re = r"""^\s*\\input{[^}]*}""" # input only 
+    tex_input_re = r"""(^[^\%]*\\input{[^}]*})|(^[^\%]*\\include{[^}]*})""" # input or include
     return re.search(tex_input_re, line) 
 
 def get_input(line):
@@ -50,6 +52,7 @@ referenced file.
             current_path = os.path.split(base_file)[0] 
             new_base_file = combine_path(current_path, get_input(line))
             output_lines += expand_file(new_base_file)
+            output_lines.append('\n') # add a new line after each file input
         else:
             output_lines.append(line)
     f.close() 
