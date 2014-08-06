@@ -49,7 +49,6 @@ referenced file.
     f = open(base_file, "r")
     for line in f:
         if is_input(line):
-            current_path = os.path.split(base_file)[0] 
             new_base_file = combine_path(current_path, get_input(line))
             output_lines += expand_file(new_base_file)
             output_lines.append('\n') # add a new line after each file input
@@ -66,4 +65,5 @@ def main(base_file, output_file):
 
 if __name__ == '__main__': 
     base_file, output_file = sys.argv[1:]
+    current_path = os.path.split(base_file)[0] 
     main(base_file, output_file)
