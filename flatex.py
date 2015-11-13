@@ -49,12 +49,10 @@ def expand_file(base_file, current_path, include_bbl):
             new_base_file = combine_path(current_path, get_input(line))
             output_lines += expand_file(new_base_file, current_path, include_bbl)
             output_lines.append('\n')  # add a new line after each file input
+        elif include_bbl and line.startswith("\\bibliography") and (not line.startswith("\\bibliographystyle")):
+            output_lines += bbl_file(base_file)
         else:
-            # Optionally replace \bibliography with content of .bbl file
-            if include_bbl and line.startswith("\\bibliography"):
-                output_lines += bbl_file(base_file)
-            else:
-                output_lines.append(line)
+            output_lines.append(line)
     f.close()
     return output_lines
 
