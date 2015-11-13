@@ -1,15 +1,7 @@
-#!usr/bin/env python
-"""
-This "flattens" a LaTeX document by replacing all \input{X} lines w/ the
-text actually contained in X. See associated README.md for details.
-Use as a python module in a python script by saying import flatex then
-flatex.main(in file, out file)
-"""
-
+import click
 import os
 import re
 import sys
-
 
 def is_input(line):
     """
@@ -33,7 +25,7 @@ def get_input(line):
 
 def combine_path(base_path, relative_ref):
     """
-    Combines the base path of the tex document being worked on with the the
+    Combines the base path of the tex document being worked on with the
     relate reference found in that document.
     """
     if (base_path != ""):
@@ -45,7 +37,7 @@ def combine_path(base_path, relative_ref):
         return os.path.abspath(relative_ref) + '.tex'
 
 
-def expand_file(base_file, include_bbl):
+def expand_file(base_file, current_path, include_bbl):
     """
     Recursively-defined function that takes as input a file and returns it
     with all the inputs replaced with the contents of the referenced file.
@@ -55,7 +47,7 @@ def expand_file(base_file, include_bbl):
     for line in f:
         if is_input(line):
             new_base_file = combine_path(current_path, get_input(line))
-            output_lines += expand_file(new_base_file, include_bbl)
+            output_lines += expand_file(new_base_file, current_path, include_bbl)
             output_lines.append('\n')  # add a new line after each file input
         else:
             # Optionally replace \bibliography with content of .bbl file
@@ -75,39 +67,19 @@ def bbl_file(base_file):
     return open(bbl_path).readlines()
 
 
-def main(base_file, output_file, include_bbl=False):
-
-    include_bbl = True
-
+@click.command()
+@click.argument('base_file', type = click.Path())
+@click.argument('output_file', type = click.Path())
+@click.option('--include_bbl/--no_bbl', default=False)
+def main(base_file, output_file, include_bbl = False):
+    
+    """
+    This "flattens" a LaTeX document by replacing all \input{X} lines w/ the
+    text actually contained in X. See associated README.md for details.
+    """
+    current_path = os.path.split(base_file)[0]
     g = open(output_file, "w")
-    g.write(''.join(expand_file(base_file, include_bbl)))
+    g.write(''.join(expand_file(base_file, current_path, include_bbl)))
     g.close()
     return None
 
-
-def parse_input(arguments):
-
-    usage = "Usage: python flatex input.tex output.tex [include_bbl]"
-
-    if len(cmd_input) == 2:
-        base_file, output_file = arguments
-        include_bbl = False
-    elif len(cmd_input) == 3:
-        base_file, output_file, bib = arguments
-        if bib == "include_bbl":
-            include_bbl = True
-        else:
-            print(usage)
-            sys.exit(0)
-    else:
-        print(usage)
-        sys.exit(0)
-
-    return base_file, output_file, include_bbl
-
-
-if __name__ == '__main__':
-    cmd_input = sys.argv[1:]
-    base_file, output_file, include_bbl = parse_input(cmd_input)
-    current_path = os.path.split(base_file)[0]
-    main(base_file, output_file, include_bbl)
