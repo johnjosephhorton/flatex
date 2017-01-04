@@ -1,7 +1,7 @@
-import click
+#!/usr/bin/env python
 import os
 import re
-import sys
+
 
 def is_input(line):
     """
@@ -65,12 +65,7 @@ def bbl_file(base_file):
     return open(bbl_path).readlines()
 
 
-@click.command()
-@click.argument('base_file', type = click.Path())
-@click.argument('output_file', type = click.Path())
-@click.option('--include_bbl/--no_bbl', default=False)
-def main(base_file, output_file, include_bbl = False):
-    
+def _main(base_file, output_file, include_bbl=False):
     """
     This "flattens" a LaTeX document by replacing all \input{X} lines w/ the
     text actually contained in X. See associated README.md for details.
@@ -81,3 +76,27 @@ def main(base_file, output_file, include_bbl = False):
     g.close()
     return None
 
+
+try:
+    import click
+
+    @click.command()
+    @click.argument('base_file', type=click.Path())
+    @click.argument('output_file', type=click.Path())
+    @click.option('--include_bbl/--no_bbl', default=False)
+    def main(base_file, output_file, include_bbl=False):
+        _main(base_file, output_file, include_bbl)
+
+except ImportError:
+    import argparse
+
+    main = _main
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('base_file', type=str)
+    parser.add_argument('output_file', type=str)
+    parser.add_argument('--include_bbl', action='store_true')
+    args = parser.parse_args()
+
+    if __name__ == '__main__':
+        main(base_file=args.base_file, output_file=args.output_file, include_bbl=args.include_bbl)
