@@ -37,7 +37,7 @@ def combine_path(base_path, relative_ref):
         return os.path.abspath(relative_ref) + '.tex'
 
 
-def expand_file(base_file, current_path, include_bbl):
+def expand_file(base_file, current_path, include_bbl, noline):
     """
     Recursively-defined function that takes as input a file and returns it
     with all the inputs replaced with the contents of the referenced file.
@@ -47,8 +47,11 @@ def expand_file(base_file, current_path, include_bbl):
     for line in f:
         if is_input(line):
             new_base_file = combine_path(current_path, get_input(line))
-            output_lines += expand_file(new_base_file, current_path, include_bbl)
-            output_lines.append('\n')  # add a new line after each file input
+            output_lines += expand_file(new_base_file, current_path, include_bbl, noline)
+            if noline:
+                pass
+            else:
+                output_lines.append('\n')  # add a new line after each file input
         elif include_bbl and line.startswith("\\bibliography") and (not line.startswith("\\bibliographystyle")):
             output_lines += bbl_file(base_file)
         else:
@@ -69,7 +72,8 @@ def bbl_file(base_file):
 @click.argument('base_file', type = click.Path())
 @click.argument('output_file', type = click.Path())
 @click.option('--include_bbl/--no_bbl', default=False)
-def main(base_file, output_file, include_bbl = False):
+@click.option("--noline", is_flag = True)
+def main(base_file, output_file, include_bbl = False, noline = False):
     
     """
     This "flattens" a LaTeX document by replacing all \input{X} lines w/ the
@@ -77,7 +81,7 @@ def main(base_file, output_file, include_bbl = False):
     """
     current_path = os.path.split(base_file)[0]
     g = open(output_file, "w")
-    g.write(''.join(expand_file(base_file, current_path, include_bbl)))
+    g.write(''.join(expand_file(base_file, current_path, include_bbl, noline)))
     g.close()
     return None
 
