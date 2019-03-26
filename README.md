@@ -11,7 +11,7 @@ It was inspired by [this discussion on Stack Overflow](http://tex.stackexchange.
 
 To install
 ----------
-    git clone https://github.com/giovannibonaccorsi/flatex.git
+    git clone https://github.com/johnjosephhorton/flatex.git
     cd flatex
     pip install --editable . 
 
