@@ -37,7 +37,7 @@ def combine_path(base_path, relative_ref):
         return os.path.abspath(relative_ref) + '.tex'
 
 
-def expand_file(base_file, current_path, include_bbl, noline):
+def expand_file(base_file, current_path, include_bbl, noline, nocomment):
     """
     Recursively-defined function that takes as input a file and returns it
     with all the inputs replaced with the contents of the referenced file.
@@ -47,13 +47,15 @@ def expand_file(base_file, current_path, include_bbl, noline):
     for line in f:
         if is_input(line):
             new_base_file = combine_path(current_path, get_input(line))
-            output_lines += expand_file(new_base_file, current_path, include_bbl, noline)
+            output_lines += expand_file(new_base_file, current_path, include_bbl, noline, nocomment)
             if noline:
                 pass
             else:
                 output_lines.append('\n')  # add a new line after each file input
         elif include_bbl and line.startswith("\\bibliography") and (not line.startswith("\\bibliographystyle")):
             output_lines += bbl_file(base_file)
+        elif nocomment and len(line.lstrip()) > 0 and line.lstrip()[0] == "%":
+            pass
         else:
             output_lines.append(line)
     f.close()
@@ -73,7 +75,8 @@ def bbl_file(base_file):
 @click.argument('output_file', type = click.Path())
 @click.option('--include_bbl/--no_bbl', default=False)
 @click.option("--noline", is_flag = True)
-def main(base_file, output_file, include_bbl = False, noline = False):
+@click.option("--nocomment", is_flag = True)
+def main(base_file, output_file, include_bbl = False, noline = False, nocomment=False):
     
     """
     This "flattens" a LaTeX document by replacing all \input{X} lines w/ the
@@ -81,7 +84,7 @@ def main(base_file, output_file, include_bbl = False, noline = False):
     """
     current_path = os.path.split(base_file)[0]
     g = open(output_file, "w")
-    g.write(''.join(expand_file(base_file, current_path, include_bbl, noline)))
+    g.write(''.join(expand_file(base_file, current_path, include_bbl, noline, nocomment)))
     g.close()
     return None
 
