@@ -75,7 +75,8 @@ def bbl_file(base_file):
 @click.argument('output_file', type = click.Path())
 @click.option('--include_bbl/--no_bbl', default=False)
 @click.option("--noline", is_flag = True)
-@click.option("--nocomment", is_flag = True)
+@click.option("--nocomment", is_flag = True, help="remove any line that is a comment (this will preserve comments"
+                                                  "at the same line as the text)")
 def main(base_file, output_file, include_bbl = False, noline = False, nocomment=False):
     
     """
