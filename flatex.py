@@ -43,7 +43,7 @@ def expand_file(base_file, current_path, include_bbl, noline):
     with all the inputs replaced with the contents of the referenced file.
     """
     output_lines = []
-    f = open(base_file, "r")
+    f = open(base_file, "r",encoding='utf-8')
     for line in f:
         if is_input(line):
             new_base_file = combine_path(current_path, get_input(line))
@@ -80,7 +80,7 @@ def main(base_file, output_file, include_bbl = False, noline = False):
     text actually contained in X. See associated README.md for details.
     """
     current_path = os.path.split(base_file)[0]
-    g = open(output_file, "w")
+    g = open(output_file, "w",encoding='utf-8')
     g.write(''.join(expand_file(base_file, current_path, include_bbl, noline)))
     g.close()
     return None
