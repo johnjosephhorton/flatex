@@ -37,7 +37,8 @@ def combine_path(base_path, relative_ref):
         return os.path.abspath(relative_ref) + '.tex'
 
 
-def expand_file(start_base_file, base_file, current_path, include_bbl, noline, nocomment):
+
+def expand_file(start_base_file, base_file, current_path, include_bbl, noline, nocomment,no_image_path):
     """
     Recursively-defined function that takes as input a file and returns it
     with all the inputs replaced with the contents of the referenced file.
@@ -47,7 +48,7 @@ def expand_file(start_base_file, base_file, current_path, include_bbl, noline, n
     for line in f:
         if is_input(line):
             new_base_file = combine_path(current_path, get_input(line))
-            output_lines += expand_file(start_base_file, new_base_file, current_path, include_bbl, noline, nocomment)
+            output_lines += expand_file(start_base_file, new_base_file, current_path, include_bbl, noline, nocomment,no_image_path)
             if noline:
                 pass
             else:
@@ -56,10 +57,18 @@ def expand_file(start_base_file, base_file, current_path, include_bbl, noline, n
             output_lines += bbl_file(start_base_file)
         elif nocomment and len(line.lstrip()) > 0 and line.lstrip()[0] == "%":
             pass
+        elif no_image_path and "includegraphics" in line:
+            new_line = remove_image_path(line)
+            output_lines.append(new_line)
         else:
             output_lines.append(line)
     f.close()
     return output_lines
+
+def remove_image_path(line):
+    pattern = r"{.*/([a-zA-Z].*)}"  # Capture filename between last / and }
+    new_line = re.sub(pattern, r"{\1}", line)
+    return new_line
 
 
 def bbl_file(start_base_file):
@@ -79,7 +88,8 @@ def bbl_file(start_base_file):
               , help="""remove any line that is a comment 
                     (this will preserve comments"
                         "at the same line as the text)""")
-def main(base_file, output_file, include_bbl=False, noline=False, nocomment=False):
+@click.option("--no_image_path", is_flag = True)
+def main(base_file, output_file, include_bbl=False, noline=False, nocomment=False, no_image_path=False):
     
     """
     This "flattens" a LaTeX document by replacing all \input{X} lines w/ the
@@ -88,7 +98,7 @@ def main(base_file, output_file, include_bbl=False, noline=False, nocomment=Fals
     current_path = os.path.split(base_file)[0]
     g = open(output_file, "w", encoding='utf-8')
     lines = expand_file(base_file, base_file, current_path, include_bbl,
-                        noline, nocomment)
+                        noline, nocomment,no_image_path)
     content = ''.join(lines)
     g.write(content)
     g.close()
